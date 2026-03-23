@@ -1,18 +1,20 @@
-import { curriculum, CurriculumTopic, CurriculumModule } from '@/lib/curriculum'
-import { getLearningProgress, toggleTopicCompletion } from '@/app/actions/learn'
+import { getLearningProgress, getCurriculum } from '@/app/actions/learn'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, PlayCircle, BookOpen, ExternalLink, CheckCircle2 } from 'lucide-react'
+import { ChevronLeft, PlayCircle, BookOpen, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import TopicCompletionButton from './TopicCompletionButton'
 
 export default async function TopicDetailPage({ params }: { params: { topic: string } }) {
+  // Fetch curriculum from DB
+  const curriculum = await getCurriculum()
+
   // Find the topic in the curriculum
-  let currentTopic: CurriculumTopic | null = null
-  let currentModule: CurriculumModule | null = null
+  let currentTopic: any = null
+  let currentModule: any = null
 
   for (const mod of curriculum) {
-    const topic = mod.topics.find(t => t.id === params.topic)
+    const topic = mod.topics?.find((t: any) => t.id === params.topic)
     if (topic) {
       currentTopic = topic
       currentModule = mod
@@ -80,7 +82,7 @@ export default async function TopicDetailPage({ params }: { params: { topic: str
           </h2>
           
           <div className="flex flex-col gap-4">
-            {currentTopic.resources.map((res, idx) => (
+            {currentTopic.resources?.map((res: any, idx: number) => (
               <a 
                 key={idx}
                 href={res.url}
@@ -106,7 +108,7 @@ export default async function TopicDetailPage({ params }: { params: { topic: str
             <h3 className="font-black mb-6 uppercase tracking-widest text-xs text-gray-500">Practice Problems</h3>
             
             <div className="flex flex-col gap-3">
-              {currentTopic.practiceProblems.map((prob, idx) => (
+              {currentTopic.practiceProblems?.map((prob: any, idx: number) => (
                 <a 
                   key={idx}
                   href={prob.url}

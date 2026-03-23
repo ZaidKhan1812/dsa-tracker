@@ -72,3 +72,32 @@ export async function updatePreferredLanguage(language: string) {
   revalidatePath('/dashboard/learn')
   return { success: true }
 }
+
+export async function getCurriculum() {
+  const supabase = await createClient()
+
+  const { data: modules, error } = await supabase
+    .from('curriculum_modules')
+    .select(`
+      id, title, description, icon, order_index,
+      topics:curriculum_topics (
+        id, title, description, difficulty, order_index,
+        resources:curriculum_resources ( type, title, url ),
+        practiceProblems:curriculum_problems ( title, difficulty, url )
+      )
+    `)
+    .order('order_index')
+
+  if (error || !modules) {
+    console.error("Error fetching curriculum:", error)
+    return []
+  }
+
+  // Supabase returns nested relations as arrays, sorting topics by order_index
+  const formattedModules = modules.map((mod: any) => ({
+    ...mod,
+    topics: mod.topics ? mod.topics.sort((a: any, b: any) => a.order_index - b.order_index) : []
+  }))
+
+  return formattedModules
+}

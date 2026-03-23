@@ -2,13 +2,25 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Code2, LogOut, BookOpen } from 'lucide-react'
+import { LayoutDashboard, Code2, LogOut, BookOpen, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { useState, useEffect } from 'react'
 
 export default function DashboardSidebar() {
   const pathname = usePathname()
   const supabase = createClient()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email === 'zaidkhan1812s@gmail.com') {
+        setIsAdmin(true)
+      }
+    }
+    checkAdmin()
+  }, [])
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -20,6 +32,10 @@ export default function DashboardSidebar() {
     { name: 'LeetCode Sync', href: '/dashboard/leetcode', icon: Code2 },
     { name: 'Learn DSA', href: '/dashboard/learn', icon: BookOpen },
   ]
+
+  if (isAdmin) {
+    links.push({ name: 'Admin', href: '/dashboard/admin', icon: Settings })
+  }
 
   return (
     <aside className="w-full md:w-64 glass-strong border-r border-white/5 flex flex-col justify-between shrink-0">

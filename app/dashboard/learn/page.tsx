@@ -1,15 +1,17 @@
-import { getLearningProgress } from '@/app/actions/learn'
-import { curriculum } from '@/lib/curriculum'
+import { getLearningProgress, getCurriculum } from '@/app/actions/learn'
 import Link from 'next/link'
-import { BookOpen, CheckCircle2, ChevronRight, Lock } from 'lucide-react'
+import { BookOpen, CheckCircle2, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default async function LearnOverviewPage() {
-  const progressResult = await getLearningProgress()
+  const [progressResult, curriculum] = await Promise.all([
+    getLearningProgress(),
+    getCurriculum()
+  ])
   const completedTopics = (progressResult as any).completedTopics || []
 
   // Calculate overall progress
-  const totalTopics = curriculum.reduce((acc, mod) => acc + mod.topics.length, 0)
+  const totalTopics = (curriculum as any[]).reduce((acc, mod) => acc + (mod.topics?.length || 0), 0)
   const completedCount = completedTopics.length
   const progressPercentage = totalTopics > 0 ? Math.round((completedCount / totalTopics) * 100) : 0
 
@@ -48,11 +50,11 @@ export default async function LearnOverviewPage() {
 
       {/* ── Curriculum Modules ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {curriculum.map((mod, idx) => {
-          const modTotal = mod.topics.length
-          const modCompleted = mod.topics.filter(t => completedTopics.includes(t.id)).length
+        {curriculum.map((mod: any, idx: number) => {
+          const modTotal = mod.topics?.length || 0
+          const modCompleted = mod.topics?.filter((t: any) => completedTopics.includes(t.id)).length || 0
           const modProgress = modTotal > 0 ? Math.round((modCompleted / modTotal) * 100) : 0
-          const isFullyCompleted = modCompleted === modTotal
+          const isFullyCompleted = modCompleted === modTotal && modTotal > 0
 
           return (
             <div key={mod.id} className="glass p-8 rounded-[32px] border border-white/5 flex flex-col hover:border-white/10 transition-colors">
@@ -81,7 +83,7 @@ export default async function LearnOverviewPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                {mod.topics.map(topic => {
+                {mod.topics?.map((topic: any) => {
                   const isTopicCompleted = completedTopics.includes(topic.id)
                   return (
                     <Link 
