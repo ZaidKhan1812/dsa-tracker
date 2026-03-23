@@ -92,3 +92,50 @@ export async function addProblem(data: { topic_id: string, title: string, diffic
   revalidatePath(`/dashboard/learn/${data.topic_id}`)
   return { success: true }
 }
+export async function restoreCurriculum() {
+  if (!await isAdmin()) return { error: 'Unauthorized' }
+  const supabase = await createClient()
+
+  try {
+    const { curriculum } = await import('@/lib/curriculum')
+    for (const mod of curriculum) {
+      // Upsert Module
+      await supabase.from('curriculum_modules').upsert({
+        id: mod.id,
+        title: mod.title,
+        description: mod.description,
+        icon: mod.icon,
+        order_index: curriculum.indexOf(mod)
+      })
+
+      // Upsert Topics
+      for (const [tIdx, topic] of mod.topics.entries()) {
+        await supabase.from('curriculum_topics').upsert({
+          id: topic.id,
+          module_id: mod.id,
+          title: topic.title,
+          description: topic.description,
+          difficulty: topic.difficulty,
+          order_index: tIdx
+        })
+
+        // Upsert Resources & Problems
+        if (topic.resources.length > 0) {
+          await supabase.from('curriculum_resources').upsert(
+            topic.resources.map(r => ({ topic_id: topic.id, type: r.type, title: r.title, url: r.url }))
+          )
+        }
+        if (topic.practiceProblems.length > 0) {
+          await supabase.from('curriculum_problems').upsert(
+            topic.practiceProblems.map(p => ({ topic_id: topic.id, title: p.title, difficulty: p.difficulty, url: p.url }))
+          )
+        }
+      }
+    }
+    revalidatePath('/dashboard/learn')
+    revalidatePath('/dashboard/admin')
+    return { success: true }
+  } catch (err: any) {
+    return { error: err.message }
+  }
+}

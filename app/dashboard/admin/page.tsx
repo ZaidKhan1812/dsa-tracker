@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { Settings, Plus, Trash2, Edit3, ExternalLink, ChevronRight } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import ModuleForm from '@/components/admin/ModuleForm'
-import { deleteModule } from '@/app/actions/admin'
+import { deleteModule, restoreCurriculum } from '@/app/actions/admin'
 import DeleteButton from '@/components/admin/DeleteButton'
+import { RefreshCcw } from 'lucide-react'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -35,12 +36,20 @@ export default async function AdminDashboard() {
           </h1>
           <p className="text-gray-400 mt-2">Manage your DSA modules, topics, and resources.</p>
         </div>
-        <Link 
-          href="/dashboard/learn"
-          className="glass px-6 py-2 rounded-xl text-sm font-bold hover:bg-white/5 transition-all"
-        >
-          View Live Site
-        </Link>
+        <div className="flex gap-4">
+          <form action={restoreCurriculum}>
+            <button className="glass px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-500/10 hover:text-indigo-400 transition-all">
+              <RefreshCcw className="w-4 h-4" />
+              Restore Defaults
+            </button>
+          </form>
+          <Link 
+            href="/dashboard/learn"
+            className="glass px-6 py-2 rounded-xl text-sm font-bold hover:bg-white/5 transition-all"
+          >
+            View Live Site
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
