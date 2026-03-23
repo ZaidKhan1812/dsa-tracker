@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Code2, LogOut } from 'lucide-react'
+import { LayoutDashboard, Code2, LogOut, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 
@@ -18,6 +18,7 @@ export default function DashboardSidebar() {
   const links = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'LeetCode Sync', href: '/dashboard/leetcode', icon: Code2 },
+    { name: 'Learn DSA', href: '/dashboard/learn', icon: BookOpen },
   ]
 
   return (

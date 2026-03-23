@@ -1,0 +1,3 @@
+﻿app/dashboard/learn/page.tsx(13,26): error TS18048: 'completedTopics' is possibly 'undefined'.
+app/dashboard/learn/page.tsx(53,55): error TS18048: 'completedTopics' is possibly 'undefined'.
+app/dashboard/learn/page.tsx(85,44): error TS18048: 'completedTopics' is possibly 'undefined'.
