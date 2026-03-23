@@ -14,7 +14,7 @@ export default async function AdminDashboard() {
   }
 
   // Double check admin (you can change this email)
-  const adminEmails = ['zaidkhan1812s@gmail.com'] // Example
+  const adminEmails = ['zaidkhan18122007@gmail.com'] // Example
   if (!adminEmails.includes(user.email || '')) {
     redirect('/dashboard')
   }

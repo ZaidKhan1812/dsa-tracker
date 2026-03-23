@@ -12,7 +12,7 @@ async function isAdmin() {
   const { data: { user } } = await supabase.auth.getUser()
   
   // You can customize this email to your own
-  const adminEmails = ['zaidkhan1812s@gmail.com'] // Example
+  const adminEmails = ['zaidkhan18122007@gmail.com'] // Example
   return adminEmails.includes(user?.email || '')
 }
 

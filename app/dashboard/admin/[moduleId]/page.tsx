@@ -14,7 +14,7 @@ export default async function ModuleAdminPage({ params }: { params: { moduleId: 
 
   if (!user) redirect('/login')
 
-  const adminEmails = ['zaidkhan1812s@gmail.com'] // Example
+  const adminEmails = ['zaidkhan18122007@gmail.com'] // Example
   if (!adminEmails.includes(user.email || '')) redirect('/dashboard')
 
   const curriculum = await getCurriculum()
