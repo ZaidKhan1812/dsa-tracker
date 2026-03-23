@@ -24,7 +24,7 @@ export async function addModule(data: { id: string, title: string, description: 
   if (error) return { error: error.message }
 
   revalidatePath('/dashboard/learn')
-  revalidatePath('/admin')
+  revalidatePath('/dashboard/admin')
   return { success: true }
 }
 
@@ -36,7 +36,7 @@ export async function deleteModule(moduleId: string) {
   if (error) return { error: error.message }
 
   revalidatePath('/dashboard/learn')
-  revalidatePath('/admin')
+  revalidatePath('/dashboard/admin')
   return { success: true }
 }
 
@@ -45,11 +45,14 @@ export async function addTopic(data: { id: string, module_id: string, title: str
   const supabase = await createClient()
 
   const { error } = await supabase.from('curriculum_topics').insert(data)
-  if (error) return { error: error.message }
+  if (error) {
+    console.error("Error adding topic:", error)
+    return { error: error.message }
+  }
 
   revalidatePath('/dashboard/learn')
   revalidatePath(`/dashboard/learn/${data.id}`)
-  revalidatePath(`/admin/${data.module_id}`)
+  revalidatePath(`/dashboard/admin/${data.module_id}`)
   return { success: true }
 }
 
@@ -58,10 +61,13 @@ export async function deleteTopic(topicId: string, moduleId: string) {
   const supabase = await createClient()
 
   const { error } = await supabase.from('curriculum_topics').delete().eq('id', topicId)
-  if (error) return { error: error.message }
+  if (error) {
+    console.error("Error deleting topic:", error)
+    return { error: error.message }
+  }
 
   revalidatePath('/dashboard/learn')
-  revalidatePath(`/admin/${moduleId}`)
+  revalidatePath(`/dashboard/admin/${moduleId}`)
   return { success: true }
 }
 
