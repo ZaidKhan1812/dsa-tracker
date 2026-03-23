@@ -6,7 +6,8 @@ import { redirect } from 'next/navigation'
 import ModuleForm from '@/components/admin/ModuleForm'
 import { deleteModule, restoreCurriculum } from '@/app/actions/admin'
 import DeleteButton from '@/components/admin/DeleteButton'
-import { RefreshCcw } from 'lucide-react'
+import { RefreshCcw, Github } from 'lucide-react'
+import ImporterCard from '@/components/admin/ImporterCard'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -99,6 +100,27 @@ export default async function AdminDashboard() {
           <ModuleForm />
         </div>
 
+      </div>
+
+      {/* ── External Importers ── */}
+      <div className="flex flex-col gap-8 mt-12 pb-12">
+        <div className="flex items-center gap-3">
+          <Github className="w-6 h-6 text-gray-500" />
+          <h2 className="text-2xl font-black">External Importers</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <ImporterCard 
+            title="freeCodeCamp JS DSA"
+            description="Import algorithm scripting and data structure challenges from the official FCC English curriculum."
+            blocks={[
+              { id: 'basic-data-structures', name: 'Basic Data Structures' },
+              { id: 'basic-algorithm-scripting', name: 'Basic Algorithm Scripting' },
+              { id: 'intermediate-algorithm-scripting', name: 'Intermediate Algorithm Scripting' },
+              { id: 'object-oriented-programming', name: 'Object Oriented Programming' },
+              { id: 'functional-programming', name: 'Functional Programming' }
+            ]}
+          />
+        </div>
       </div>
 
     </div>

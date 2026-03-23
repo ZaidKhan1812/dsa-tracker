@@ -139,3 +139,72 @@ export async function restoreCurriculum() {
     return { error: err.message }
   }
 }
+
+export async function importFCCBlock(blockName: string) {
+  if (!await isAdmin()) return { error: 'Unauthorized' }
+  const supabase = await createClient()
+
+  try {
+    // 1. Fetch Structural JSON to get challenge order
+    const structureUrl = `https://raw.githubusercontent.com/freeCodeCamp/freeCodeCamp/main/curriculum/structure/blocks/${blockName}.json`
+    const structureRes = await fetch(structureUrl)
+    if (!structureRes.ok) throw new Error(`Could not find block: ${blockName}`)
+    const structure = await structureRes.json()
+
+    // 2. Create/Upsert Module
+    const moduleId = `fcc-${blockName}`
+    const { error: modError } = await supabase.from('curriculum_modules').upsert({
+      id: moduleId,
+      title: structure.name,
+      description: `Course imported from freeCodeCamp: ${structure.name}`,
+      icon: 'terminal',
+      order_index: 99
+    })
+    if (modError) throw modError
+
+    // 3. Import each challenge
+    for (const [idx, [challengeId, title]] of (structure.challengeOrder as [string, string][]).entries()) {
+      const mdUrl = `https://raw.githubusercontent.com/freeCodeCamp/freeCodeCamp/main/curriculum/challenges/english/blocks/${blockName}/${challengeId}.md`
+      const mdRes = await fetch(mdUrl)
+      if (!mdRes.ok) continue
+
+      const mdText = await mdRes.text()
+
+      // Extract description and instructions
+      const descMatch = mdText.match(/# --description--\s*([\s\S]*?)\s*# --/)
+      const instrMatch = mdText.match(/# --instructions--\s*([\s\S]*?)\s*# --/)
+
+      let description = (descMatch?.[1] || '').trim()
+      description = description.replace(/<[^>]*>?/gm, '') // Remove HTML tags
+      
+      const instructions = (instrMatch?.[1] || '').trim().replace(/<[^>]*>?/gm, '')
+      
+      const fullDesc = `${description}\n\n**Goal:**\n${instructions}`
+
+      const topicId = `fcc-${challengeId}`
+      await supabase.from('curriculum_topics').upsert({
+        id: topicId,
+        module_id: moduleId,
+        title: title,
+        description: fullDesc.substring(0, 2000), 
+        difficulty: 'medium',
+        order_index: idx
+      })
+
+      // Add resource link
+      await supabase.from('curriculum_resources').upsert({
+        topic_id: topicId,
+        type: 'article',
+        title: 'freeCodeCamp Challenge',
+        url: `https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/basic-data-structures/${challengeId}`
+      })
+    }
+
+    revalidatePath('/dashboard/learn')
+    revalidatePath('/dashboard/admin')
+    return { success: true }
+  } catch (err: any) {
+    console.error("FCC Import Error:", err)
+    return { error: err.message }
+  }
+}
