@@ -5,6 +5,7 @@ import { Settings, Plus, Trash2, Edit3, ExternalLink, ChevronRight } from 'lucid
 import { redirect } from 'next/navigation'
 import ModuleForm from '@/components/admin/ModuleForm'
 import { deleteModule } from '@/app/actions/admin'
+import DeleteButton from '@/components/admin/DeleteButton'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
@@ -68,14 +69,12 @@ export default async function AdminDashboard() {
                     <Edit3 className="w-4 h-4" />
                   </Link>
 
-                  <form action={async () => {
-                    'use server'
-                    await deleteModule(mod.id)
-                  }}>
-                    <button className="p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </form>
+                  <DeleteButton 
+                    onDelete={async () => {
+                      'use server'
+                      await deleteModule(mod.id)
+                    }} 
+                  />
                 </div>
               </div>
             ))}

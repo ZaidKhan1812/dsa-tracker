@@ -7,6 +7,7 @@ import TopicForm from '@/components/admin/TopicForm'
 import ResourceForm from '@/components/admin/ResourceForm'
 import ProblemForm from '@/components/admin/ProblemForm'
 import { deleteTopic } from '@/app/actions/admin'
+import DeleteButton from '@/components/admin/DeleteButton'
 
 export default async function ModuleAdminPage({ params }: { params: { moduleId: string } }) {
   const supabase = await createClient()
@@ -64,14 +65,12 @@ export default async function ModuleAdminPage({ params }: { params: { moduleId: 
                     <p className="text-gray-400 text-sm">{topic.description}</p>
                   </div>
                   
-                  <form action={async () => {
-                    'use server'
-                    await deleteTopic(topic.id, currentModule.id)
-                  }}>
-                    <button className="p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </form>
+                  <DeleteButton 
+                    onDelete={async () => {
+                      'use server'
+                      await deleteTopic(topic.id, currentModule.id)
+                    }} 
+                  />
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8 relative z-10">
