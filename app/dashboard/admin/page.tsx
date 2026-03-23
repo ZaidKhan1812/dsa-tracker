@@ -37,7 +37,10 @@ export default async function AdminDashboard() {
           <p className="text-gray-400 mt-2">Manage your DSA modules, topics, and resources.</p>
         </div>
         <div className="flex gap-4">
-          <form action={restoreCurriculum}>
+          <form action={async (formData: FormData) => {
+            'use server'
+            await restoreCurriculum()
+          }}>
             <button className="glass px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-indigo-500/10 hover:text-indigo-400 transition-all">
               <RefreshCcw className="w-4 h-4" />
               Restore Defaults
